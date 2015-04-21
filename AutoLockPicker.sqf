@@ -19,31 +19,34 @@
 // ======================================================================================================================================================================================
 
 // Which locks can be opened
-LockpickLandVehicles 				= true;						// All land vehicles (cars, vans, trucks etc)  	::: acceptable values true or false
-LockpickAir 						= true; 						// Helis and jets  								::: acceptable values true or false
+LockpickLandVehicles 					= true;						// All land vehicles (cars, vans, trucks etc)  	::: acceptable values true or false
+LockpickAir 						= true; 					// Helis and jets  								::: acceptable values true or false
 LockpickShip 						= true;						// Boats, jetskis and submarines  				::: acceptable values true or false
-LockpickEpochDoors 				= true;						// Epoch build-able doors  						::: acceptable values true or false
+LockpickEpochDoors 					= true;						// Epoch build-able doors  						::: acceptable values true or false
 
 // Chance to succeed or be electrocuted
-SuccessChance 					= 20;						// (Between 1-100) % Chance to successfully pick the lock
-ElectrocuteChance 				= 10;						// (Between 1-100) % Chance of electrocution on if the lock pick fails
+SuccessChanceVehicles					= 20;						// (Between 1-100) % Chance to successfully pick the lock
+SuccessChanceEpochDoors					= 20;						// (Between 1-100) % Chance to successfully pick the lock
+ElectrocuteChance 					= 10;						// (Between 1-100) % Chance of electrocution on if the lock pick fails
 
 // Damage Settings
-InflictDamage 					= true;						// If true damage is added, if false just stun		
-MinimumDamage 					= 50;						// (Between 1-100) min% of full health Damage to inflict must be less than MaximumDamage
-MaximumDamage 					= 90;						// (Between 1-100) max% of full health Damage to inflict must be more than MinimumDamage
+InflictDamage 						= true;						// If true damage is added, if false just stun		
+MinimumDamage 						= 50;						// (Between 1-100) min% of full health Damage to inflict must be less than MaximumDamage
+MaximumDamage 						= 90;						// (Between 1-100) max% of full health Damage to inflict must be more than MinimumDamage
 StunTime 						= 15;						// Time in seconds to stun the player on electrocution (if it doesn't kill them)
 
 // Materials Required to Create AutoLockPicker
-EnergyRequired					= 100;						// Amount of energy expended operating AutoLockPicker (0 for zero energy required)
+EnergyRequired						= 100;						// Amount of energy expended operating AutoLockPicker (0 for zero energy required)
 MaterialRequired1					= 'CircuitParts';				// First material required to create AutoLockPicker (default is 'CircuitParts' or Electronic Component)
-MaterialRequired2					= 'ItemCorrugated';			// Second material required to create AutoLockPicker (default is 'ItemCorrugated' or small metal parts)
+MaterialRequired1Count					= 1;
+MaterialRequired2					= 'ItemCorrugated';				// Second material required to create AutoLockPicker (default is 'ItemCorrugated' or small metal parts)
+MaterialRequired2Count					= 1;
 
 // Usage Restrictions
-AllowInSafeZone					= false;						// (Leave true if you don't use inSafezone) Allow use of AutoLockPicker in safezones 
-															// (using the boolean variable inSafezone set here http://epochmod.com/forum/index.php?/topic/32555-extended-safezone-script-working/)
+AllowInSafeZone						= false;						// (Leave true if you don't use inSafezone) Allow use of AutoLockPicker in safezones 
+														// (using the boolean variable inSafezone set here http://epochmod.com/forum/index.php?/topic/32555-extended-safezone-script-working/)
 _MinimumPlayers 					= 0;							// Number of players required online before the option to lock pick becomes available (set to 0 to always allow)
-AllowLockPicksNear				= false;						// (Leave true for no restriction) selecting false will make the script check if one has been placed within 5m of the player
+AllowLockPicksNear					= false;						// (Leave true for no restriction) selecting false will make the script check if one has been placed within 5m of the player
 
 // ======================================================================================================================================================================================
 // End of User configurable Variables
@@ -95,7 +98,17 @@ AutoLockPicker_MatsCheck =
 	_charge2 = _this select 1;
 	_unit = _this select 2;
 	_hasIt1 = _charge1 in (magazines _unit);
-	_hasIt2 = _charge2 in (magazines _unit);
+	_hasIt1Count = {_x == _charge1} count magazines player;
+	
+	
+	_hasIt2 = _charge2 in (magazines _unit);	
+	_hasIt2Count = {_x == _charge2} count magazines player;
+	_hasEnough = false;
+	
+	if(_hasIt1Count >= MaterialRequired1Count && _hasIt2Count >= MaterialRequired2Count) then
+	{
+		_hasEnough = true;
+	};
 	
 	_hasEnergy = false;
 	if(EnergyRequired == 0 || EPOCH_playerEnergy - EnergyRequired >= 0) then
@@ -142,7 +155,7 @@ AutoLockPicker_MatsCheck =
 		_nearVehs = true;
 	};
 	
-	_return = (_hasIt1 && _hasIt2 && _nearVehs && alive _unit && SafeToALP && _hasEnergy && _CanPlace);
+	_return = (_hasEnough && _nearVehs && alive _unit && SafeToALP && _hasEnergy && _CanPlace);
 	_return
 };
 
@@ -154,12 +167,21 @@ AutoLockPicker_Activate =
 	{
 		if(alive _x && SafeToALP) then
 		{
+			_nearVehicle = (nearestObjects [_x,LockPickableItems,5]) select 0;
+			if ((typeOf _nearVehicle) in ["CinderWallGarage_EPOCH","WoodLargeWallDoorL_EPOCH","WoodLargeWallDoor_EPOCH"]) then
+			{
+				SuccessChance = SuccessChanceEpochDoors;
+			}
+			else
+			{
+				SuccessChance = SuccessChanceVehicles;
+			};
+			
 			// Chance to unlock
 			_chance = Ceil random 100;			
-			if(_chance <= SuccessChance) then{
-				// Unlock the door or vehicle
-				
-				_nearVehicle = (nearestObjects [_x,LockPickableItems,5]) select 0;
+			if(_chance <= SuccessChance) then
+			{			
+				// Unlock the door or vehicle							
 				deleteVehicle _x;
 
 				ALPUNLOCK = [_nearVehicle];
@@ -308,8 +330,9 @@ AutoLockPicker_AttachALP =
 	_unit = _array select 1;
 	private "_class";
 	
-	_unit removeMagazine MaterialRequired1;
-	_unit removeMagazine MaterialRequired2;
+	_unit removemagazines [MaterialRequired1, MaterialRequired1Count];
+	_unit removemagazines [MaterialRequired2, MaterialRequired2Count];
+	
 	EPOCH_playerEnergy = EPOCH_playerEnergy - EnergyRequired;
 	_unit playMove "AinvPercMstpSnonWnonDnon_Putdown_AmovPercMstpSnonWnonDnon";
 	
