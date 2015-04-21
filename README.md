@@ -1,9 +1,9 @@
 # AutoLockPicker
 Unlock script for vehicles and locked doors for Arma 3 Epoch
 
-# =============================================================
+# =======================
 # AutoLockPicker is here!
-# =============================================================
+# =======================
 
 What is it? I hear you ask.
 
@@ -20,9 +20,9 @@ It uses 1 x Electronic Components and 1 x Small Salvage Metal to be able to acti
 If you are carrying both items and are next to a door or vehicle you get a scroll wheel action to attach the AutoLockPicker. Then use the mousewheel again to select to activate the AutoLockPicker.
 
 
-=============================================================
+# =======================
 Credits:
-=============================================================
+# =======================
 
 The starting point for this script was StealthSticks ExplosivestoVehicle script (http://www.armaholic.com/page.php?id=21652) 
 Electrocution visual after effects are from here http://www.altisliferpg.com/topic/224-effects-on-marijuana-use/
@@ -32,12 +32,12 @@ I have also created a modified version of Leighams ud.pbo (http://epochmod.com/f
 
 
 
-=============================================================
+# =======================
 How do I Install this badboy?
-=============================================================
+# =======================
 
 Step 1: Add the required Battleye Filters:
-=============================================================
+# =======================
 Add the following to publicvariable.txt
 !="AUTOLOCKPICK"
 
@@ -57,7 +57,7 @@ Around line 47 (setDamage) !="player setDamage1;"
 
 
 Step 2 Installation:
-===================================
+# =======================
 
 Place AutoLockPicker.sqf in your mission file and add a call for it to your mission init file (I initialise it from onPlayerRespawn.sqf):
 
@@ -89,10 +89,10 @@ class CfgSounds
 Then create a folder called sounds in your mission folder and copy electrocute.ogg inside it (from the download)
 
 Step Install the Server side addon:
-===================================
+# =======================
 Place a3_epoch_autolockpicker.pbo in @epochhive/addons
 
 
 Step 4 All done!
-===================================
+# =======================
 Yay!
