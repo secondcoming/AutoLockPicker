@@ -1,6 +1,6 @@
 if(isServer) then 
 {
-	"UDUNLOCK" addPublicVariableEventHandler {_this select 1 call unlock_vehicle};
+	"ALPUNLOCK" addPublicVariableEventHandler {_this select 1 call unlock_vehicle};
 
 	unlock_vehicle = {	private["_veh"];
 		_veh = _this select 0;
