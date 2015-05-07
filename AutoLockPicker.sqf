@@ -43,10 +43,10 @@ MaterialRequired2					= 'ItemCorrugated';				// Second material required to crea
 MaterialRequired2Count					= 1;
 
 // Usage Restrictions
-AllowInSafeZone						= false;						// (Leave true if you don't use inSafezone) Allow use of AutoLockPicker in safezones 
-														// (using the boolean variable inSafezone set here http://epochmod.com/forum/index.php?/topic/32555-extended-safezone-script-working/)
-_MinimumPlayers 					= 0;							// Number of players required online before the option to lock pick becomes available (set to 0 to always allow)
-AllowLockPicksNear					= false;						// (Leave true for no restriction) selecting false will make the script check if one has been placed within 5m of the player
+AllowInSafeZone						= false;					// (Leave true if you don't use inSafezone) Allow use of AutoLockPicker in safezones 
+																// (using the boolean variable inSafezone set here http://epochmod.com/forum/index.php?/topic/32555-extended-safezone-script-working/)
+_MinimumPlayers 					= 0;						// Number of players required online before the option to lock pick becomes available (set to 0 to always allow)
+AllowLockPicksNear					= false;					// (Leave true for no restriction) selecting false will make the script check if one has been placed within 5m of the player
 
 // ======================================================================================================================================================================================
 // End of User configurable Variables
@@ -330,9 +330,17 @@ AutoLockPicker_AttachALP =
 	_unit = _array select 1;
 	private "_class";
 	
-	_unit removemagazines [MaterialRequired1, MaterialRequired1Count];
-	_unit removemagazines [MaterialRequired2, MaterialRequired2Count];
-	
+	for "_i" from 1 to MaterialRequired1Count step 1 do 
+	{
+		_unit removemagazine MaterialRequired1;
+		uiSleep 0.1;
+	}; 
+	for "_i" from 1 to MaterialRequired2Count step 1 do 
+	{
+		_unit removemagazine MaterialRequired2;
+		uiSleep 0.1;
+	}; 	
+
 	EPOCH_playerEnergy = EPOCH_playerEnergy - EnergyRequired;
 	_unit playMove "AinvPercMstpSnonWnonDnon_Putdown_AmovPercMstpSnonWnonDnon";
 	
